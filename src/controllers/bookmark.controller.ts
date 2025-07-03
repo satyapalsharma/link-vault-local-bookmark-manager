@@ -8,6 +8,21 @@ export class BookmarkController {
   static async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const query = req.query as unknown as BookmarkQueryParams;
+
+      if (query.from !== undefined) {
+        const fromDate = new Date(query.from);
+        if (isNaN(fromDate.getTime())) {
+          throw new BadRequestError("Invalid from date.");
+        }
+      }
+
+      if (query.to !== undefined) {
+        const toDate = new Date(query.to);
+        if (isNaN(toDate.getTime())) {
+          throw new BadRequestError("Invalid to date.");
+        }
+      }
+
       const data = await BookmarkModel.findAll(query);
       const total = await BookmarkModel.count();
       const page = query.page || 1;
