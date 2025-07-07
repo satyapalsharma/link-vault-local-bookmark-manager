@@ -21,6 +21,20 @@ export class BookmarkModel {
       );
     }
 
+    if (params?.tag) {
+      results = results.filter((b) => b.tags.includes(params.tag!));
+    }
+
+    if (params?.from) {
+      const fromDate = new Date(params.from);
+      results = results.filter((b) => new Date(b.createdAt) >= fromDate);
+    }
+
+    if (params?.to) {
+      const toDate = new Date(params.to);
+      results = results.filter((b) => new Date(b.createdAt) <= toDate);
+    }
+
     if (params?.tags) {
       const filterTags = params.tags.toLowerCase().split(",");
       results = results.filter((b) =>
@@ -45,7 +59,7 @@ export class BookmarkModel {
         return sortOrder === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
       }
       if (typeof aVal === "boolean" && typeof bVal === "boolean") {
-        return sortOrder === "asc" ? (aVal === bVal ? 0 : aVal ? 1 : -1) : (aVal === bVal ? 0 : aVal ? -1 : 1);
+        return sortOrder === "asc" ? (aVal === bVal ? 0 : aVal ? 1 : -1) : aVal === bVal ? 0 : aVal ? -1 : 1;
       }
       return 0;
     });
