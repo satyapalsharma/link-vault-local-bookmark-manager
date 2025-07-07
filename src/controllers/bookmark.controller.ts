@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { BookmarkModel } from "@/models/Bookmark";
 import { validateUrl, validateRequired } from "@/lib/validation";
 import { BadRequestError, NotFoundError } from "@/lib/errors";
-import { CreateBookmarkInput, UpdateBookmarkInput, BookmarkQueryParams } from "@/types/bookmark";
+import { CreateBookmarkInput, UpdateBookmarkInput, AddTagInput } from "@/types/bookmark";
 
 export class BookmarkController {
   static async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -45,6 +45,13 @@ export class BookmarkController {
       const body = req.body as CreateBookmarkInput;
       validateRequired(body, ["url", "title"]);
       validateUrl(body.url);
+
+      if (body.tags !== undefined) {
+        if (!Array.isArray(body.tags) || !body.tags.every((t) => typeof t === "string" && t.trim() !== "")) {
+          throw new BadRequestError("tags must be an array of strings.");
+        }
+      }
+
       const bookmark = await BookmarkModel.create(body);
       res.status(201).json({ status: "success", data: bookmark });
     } catch (error) {
@@ -57,7 +64,46 @@ export class BookmarkController {
       const { id } = req.params;
       const body = req.body as UpdateBookmarkInput;
       if (body.url) validateUrl(body.url);
+
+      if (body.tags !== undefined) {
+        if (!Array.isArray(body.tags) || !body.tags.every((t) => typeof t === "string" && t.trim() !== "")) {
+          throw new BadRequestError("tags must be an array of strings.");
+        }
+      }
+
       const bookmark = await BookmarkModel.update(id, body);
+      if (!bookmark) {
+        throw new NotFoundError("Bookmark not found");
+      }
+      res.json({ status: "success", data: bookmark });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async addTag(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const body = req.body as AddTagInput;
+
+      if (!body.tag || typeof body.tag !== "string" || body.tag.trim() === "") {
+        throw new BadRequestError("tag must be a non-empty string.");
+      }
+
+      const bookmark = await BookmarkModel.addTag(id, body.tag);
+      if (!bookmark) {
+        throw new NotFoundError("Bookmark not found");
+      }
+      res.json({ status: "success", data: bookmark });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async removeTag(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id, tag } = req.params;
+      const bookmark = await BookmarkModel.removeTag(id, decodeURIComponent(tag));
       if (!bookmark) {
         throw new NotFoundError("Bookmark not found");
       }
