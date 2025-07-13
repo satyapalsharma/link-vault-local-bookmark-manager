@@ -33,6 +33,5 @@ export interface BookmarkQueryParams {
   search?: string;
   tags?: string;
   isFavorite?: boolean;
-  sortBy?: BookmarkSortField;
-  sortOrder?: "asc" | "desc";
+  sort?: string;
 }

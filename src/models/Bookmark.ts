@@ -32,22 +32,40 @@ export class BookmarkModel {
       results = results.filter((b) => b.isFavorite === params.isFavorite);
     }
 
-    const sortField = params?.sortBy || "createdAt";
-    const sortOrder = params?.sortOrder || "desc";
+    const sort = params?.sort || "-createdAt";
+    const sortField = sort.replace("-", "");
+    const sortDesc = sort.startsWith("-");
 
     results.sort((a, b) => {
-      const aVal = a[sortField as keyof Bookmark];
-      const bVal = b[sortField as keyof Bookmark];
-      if (aVal instanceof Date && bVal instanceof Date) {
-        return sortOrder === "asc" ? aVal.getTime() - bVal.getTime() : bVal.getTime() - aVal.getTime();
+      let cmp = 0;
+
+      if (sortField === "createdAt") {
+        const aTime = a.createdAt.getTime();
+        const bTime = b.createdAt.getTime();
+        cmp = aTime - bTime;
+      } else if (sortField === "title") {
+        cmp = a.title.toLowerCase().localeCompare(b.title.toLowerCase());
+      } else if (sortField === "lastVisitedAt") {
+        const aVal = a.lastVisited;
+        const bVal = b.lastVisited;
+        if (aVal === undefined && bVal === undefined) {
+          cmp = 0;
+        } else if (aVal === undefined) {
+          cmp = -1;
+        } else if (bVal === undefined) {
+          cmp = 1;
+        } else {
+          cmp = aVal.getTime() - bVal.getTime();
+        }
       }
-      if (typeof aVal === "string" && typeof bVal === "string") {
-        return sortOrder === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+
+      if (cmp === 0) {
+        const aTime = a.createdAt.getTime();
+        const bTime = b.createdAt.getTime();
+        cmp = bTime - aTime;
       }
-      if (typeof aVal === "boolean" && typeof bVal === "boolean") {
-        return sortOrder === "asc" ? (aVal === bVal ? 0 : aVal ? 1 : -1) : (aVal === bVal ? 0 : aVal ? -1 : 1);
-      }
-      return 0;
+
+      return sortDesc ? -cmp : cmp;
     });
 
     const page = params?.page || 1;
