@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { BookmarkModel } from "@/models/Bookmark";
 import { validateUrl, validateRequired } from "@/lib/validation";
-import { BadRequestError, NotFoundError } from "@/lib/errors";
+import { NotFoundError } from "@/lib/errors";
 import { CreateBookmarkInput, UpdateBookmarkInput, BookmarkQueryParams } from "@/types/bookmark";
 
 export class BookmarkController {
@@ -53,7 +53,8 @@ export class BookmarkController {
       validateUrl(body.url);
 
       if (body.isFavorite !== undefined && typeof body.isFavorite !== "boolean") {
-        throw new BadRequestError("isFavorite must be a boolean.");
+        res.status(400).json({ error: "isFavorite must be a boolean." });
+        return;
       }
 
       const bookmark = await BookmarkModel.create(body);
@@ -70,7 +71,8 @@ export class BookmarkController {
       if (body.url) validateUrl(body.url);
 
       if (body.isFavorite !== undefined && typeof body.isFavorite !== "boolean") {
-        throw new BadRequestError("isFavorite must be a boolean.");
+        res.status(400).json({ error: "isFavorite must be a boolean." });
+        return;
       }
 
       const bookmark = await BookmarkModel.update(id, body);
