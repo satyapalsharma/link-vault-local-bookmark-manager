@@ -79,4 +79,18 @@ export class BookmarkController {
       next(error);
     }
   }
+
+  static async visit(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const bookmark = await BookmarkModel.visit(id);
+      if (!bookmark) {
+        res.status(404).json({ error: "Bookmark not found." });
+        return;
+      }
+      res.json({ status: "success", data: bookmark });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
