@@ -4,10 +4,25 @@ import { validateUrl, validateRequired } from "@/lib/validation";
 import { BadRequestError, NotFoundError } from "@/lib/errors";
 import { CreateBookmarkInput, UpdateBookmarkInput, BookmarkQueryParams } from "@/types/bookmark";
 
+const ALLOWED_SORTS = new Set([
+  "createdAt",
+  "-createdAt",
+  "title",
+  "-title",
+  "lastVisitedAt",
+  "-lastVisitedAt",
+]);
+
 export class BookmarkController {
   static async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const query = req.query as unknown as BookmarkQueryParams;
+
+      if (query.sort && !ALLOWED_SORTS.has(query.sort)) {
+        res.status(400).json({ error: "Invalid sort parameter." });
+        return;
+      }
+
       const data = await BookmarkModel.findAll(query);
       const total = await BookmarkModel.count();
       const page = query.page || 1;
