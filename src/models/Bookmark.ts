@@ -70,7 +70,7 @@ export class BookmarkModel {
       id,
       url: input.url,
       title: input.title,
-      notes: input.notes,
+      notes: typeof input.notes === "string" ? input.notes : "",
       tags: input.tags || [],
       isFavorite: input.isFavorite ?? false,
       createdAt: now,
