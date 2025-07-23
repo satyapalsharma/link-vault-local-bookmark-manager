@@ -45,6 +45,9 @@ export class BookmarkController {
       const body = req.body as CreateBookmarkInput;
       validateRequired(body, ["url", "title"]);
       validateUrl(body.url);
+      if (body.notes !== undefined && typeof body.notes !== "string") {
+        throw new BadRequestError("notes must be a string.");
+      }
       const bookmark = await BookmarkModel.create(body);
       res.status(201).json({ status: "success", data: bookmark });
     } catch (error) {
@@ -57,6 +60,9 @@ export class BookmarkController {
       const { id } = req.params;
       const body = req.body as UpdateBookmarkInput;
       if (body.url) validateUrl(body.url);
+      if (body.notes !== undefined && typeof body.notes !== "string") {
+        throw new BadRequestError("notes must be a string.");
+      }
       const bookmark = await BookmarkModel.update(id, body);
       if (!bookmark) {
         throw new NotFoundError("Bookmark not found");
