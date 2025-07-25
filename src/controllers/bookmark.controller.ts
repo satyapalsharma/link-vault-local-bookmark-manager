@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { BookmarkModel } from "@/models/Bookmark";
 import { validateUrl, validateRequired } from "@/lib/validation";
 import { BadRequestError, NotFoundError } from "@/lib/errors";
-import { CreateBookmarkInput, UpdateBookmarkInput, AddTagInput } from "@/types/bookmark";
+import { CreateBookmarkInput, UpdateBookmarkInput, AddTagInput, BookmarkQueryParams } from "@/types/bookmark";
 
 export class BookmarkController {
   static async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
