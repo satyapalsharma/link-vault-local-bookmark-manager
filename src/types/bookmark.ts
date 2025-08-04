@@ -36,3 +36,7 @@ export interface BookmarkQueryParams {
   sortBy?: BookmarkSortField;
   sortOrder?: "asc" | "desc";
 }
+
+export interface AddTagInput {
+  tag: string;
+}

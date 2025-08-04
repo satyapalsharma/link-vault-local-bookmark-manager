@@ -8,5 +8,7 @@ router.get("/:id", BookmarkController.getById);
 router.post("/", BookmarkController.create);
 router.put("/:id", BookmarkController.update);
 router.delete("/:id", BookmarkController.delete);
+router.post("/:id/tags", BookmarkController.addTag);
+router.delete("/:id/tags/:tag", BookmarkController.removeTag);
 
 export default router;

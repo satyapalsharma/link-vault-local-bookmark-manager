@@ -8,6 +8,11 @@ export class BookmarkModel {
   private static bookmarks: Map<string, Bookmark> = new Map();
   private static counter = 0;
 
+  static normalizeTags(tags?: string[]): string[] {
+    if (!Array.isArray(tags)) return [];
+    return tags.map((tag) => tag.trim()).filter(Boolean);
+  }
+
   static async findAll(params?: BookmarkQueryParams): Promise<Bookmark[]> {
     let results = Array.from(this.bookmarks.values());
 
@@ -71,7 +76,7 @@ export class BookmarkModel {
       url: input.url,
       title: input.title,
       notes: input.notes,
-      tags: input.tags || [],
+      tags: this.normalizeTags(input.tags),
       isFavorite: input.isFavorite ?? false,
       createdAt: now,
       updatedAt: now,
@@ -87,10 +92,38 @@ export class BookmarkModel {
     const updated: Bookmark = {
       ...existing,
       ...input,
+      tags: input.tags !== undefined ? this.normalizeTags(input.tags) : existing.tags,
       updatedAt: new Date(),
     };
     this.bookmarks.set(id, updated);
     return updated;
+  }
+
+  static async addTag(id: string, tag: string): Promise<Bookmark | null> {
+    const existing = this.bookmarks.get(id);
+    if (!existing) return null;
+
+    const trimmed = tag.trim();
+    if (!trimmed) return existing;
+
+    const hasTag = existing.tags.some((t) => t === trimmed);
+    if (!hasTag) {
+      existing.tags.push(trimmed);
+      existing.updatedAt = new Date();
+      this.bookmarks.set(id, existing);
+    }
+    return existing;
+  }
+
+  static async removeTag(id: string, tag: string): Promise<Bookmark | null> {
+    const existing = this.bookmarks.get(id);
+    if (!existing) return null;
+
+    const trimmed = tag.trim();
+    existing.tags = existing.tags.filter((t) => t !== trimmed);
+    existing.updatedAt = new Date();
+    this.bookmarks.set(id, existing);
+    return existing;
   }
 
   static async delete(id: string): Promise<boolean> {
