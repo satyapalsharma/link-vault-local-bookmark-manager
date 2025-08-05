@@ -16,7 +16,17 @@ export class BookmarkModel {
   static async findAll(params?: BookmarkQueryParams): Promise<Bookmark[]> {
     let results = Array.from(this.bookmarks.values());
 
-    if (params?.search) {
+    if (params?.q) {
+      const qLower = params.q.trim().toLowerCase();
+      if (qLower) {
+        results = results.filter(
+          (b) =>
+            b.title.toLowerCase().includes(qLower) ||
+            b.url.toLowerCase().includes(qLower) ||
+            b.tags.some((tag) => tag.toLowerCase().includes(qLower))
+        );
+      }
+    } else if (params?.search) {
       const term = params.search.toLowerCase();
       results = results.filter(
         (b) =>
@@ -50,7 +60,7 @@ export class BookmarkModel {
         return sortOrder === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
       }
       if (typeof aVal === "boolean" && typeof bVal === "boolean") {
-        return sortOrder === "asc" ? (aVal === bVal ? 0 : aVal ? 1 : -1) : (aVal === bVal ? 0 : aVal ? -1 : 1);
+        return sortOrder === "asc" ? (aVal === bVal ? 0 : aVal ? 1 : -1) : bVal === aVal ? 0 : bVal ? -1 : 1;
       }
       return 0;
     });

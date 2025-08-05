@@ -31,6 +31,7 @@ export interface BookmarkQueryParams {
   page?: number;
   limit?: number;
   search?: string;
+  q?: string;
   tags?: string;
   isFavorite?: boolean;
   sortBy?: BookmarkSortField;
