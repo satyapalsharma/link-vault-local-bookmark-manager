@@ -8,25 +8,10 @@ export class BookmarkModel {
   private static bookmarks: Map<string, Bookmark> = new Map();
   private static counter = 0;
 
-  static normalizeTags(tags?: string[]): string[] {
-    if (!Array.isArray(tags)) return [];
-    return tags.map((tag) => tag.trim()).filter(Boolean);
-  }
-
   static async findAll(params?: BookmarkQueryParams): Promise<Bookmark[]> {
     let results = Array.from(this.bookmarks.values());
 
-    if (params?.q) {
-      const qLower = params.q.trim().toLowerCase();
-      if (qLower) {
-        results = results.filter(
-          (b) =>
-            b.title.toLowerCase().includes(qLower) ||
-            b.url.toLowerCase().includes(qLower) ||
-            b.tags.some((tag) => tag.toLowerCase().includes(qLower))
-        );
-      }
-    } else if (params?.search) {
+    if (params?.search) {
       const term = params.search.toLowerCase();
       results = results.filter(
         (b) =>
@@ -34,6 +19,20 @@ export class BookmarkModel {
           b.url.toLowerCase().includes(term) ||
           b.notes?.toLowerCase().includes(term)
       );
+    }
+
+    if (params?.tag) {
+      results = results.filter((b) => b.tags.includes(params.tag!));
+    }
+
+    if (params?.from) {
+      const fromDate = new Date(params.from);
+      results = results.filter((b) => new Date(b.createdAt) >= fromDate);
+    }
+
+    if (params?.to) {
+      const toDate = new Date(params.to);
+      results = results.filter((b) => new Date(b.createdAt) <= toDate);
     }
 
     if (params?.tags) {
@@ -60,7 +59,7 @@ export class BookmarkModel {
         return sortOrder === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
       }
       if (typeof aVal === "boolean" && typeof bVal === "boolean") {
-        return sortOrder === "asc" ? (aVal === bVal ? 0 : aVal ? 1 : -1) : bVal === aVal ? 0 : bVal ? -1 : 1;
+        return sortOrder === "asc" ? (aVal === bVal ? 0 : aVal ? 1 : -1) : aVal === bVal ? 0 : aVal ? -1 : 1;
       }
       return 0;
     });
@@ -86,7 +85,7 @@ export class BookmarkModel {
       url: input.url,
       title: input.title,
       notes: input.notes,
-      tags: this.normalizeTags(input.tags),
+      tags: input.tags || [],
       isFavorite: input.isFavorite ?? false,
       createdAt: now,
       updatedAt: now,
@@ -102,38 +101,10 @@ export class BookmarkModel {
     const updated: Bookmark = {
       ...existing,
       ...input,
-      tags: input.tags !== undefined ? this.normalizeTags(input.tags) : existing.tags,
       updatedAt: new Date(),
     };
     this.bookmarks.set(id, updated);
     return updated;
-  }
-
-  static async addTag(id: string, tag: string): Promise<Bookmark | null> {
-    const existing = this.bookmarks.get(id);
-    if (!existing) return null;
-
-    const trimmed = tag.trim();
-    if (!trimmed) return existing;
-
-    const hasTag = existing.tags.some((t) => t === trimmed);
-    if (!hasTag) {
-      existing.tags.push(trimmed);
-      existing.updatedAt = new Date();
-      this.bookmarks.set(id, existing);
-    }
-    return existing;
-  }
-
-  static async removeTag(id: string, tag: string): Promise<Bookmark | null> {
-    const existing = this.bookmarks.get(id);
-    if (!existing) return null;
-
-    const trimmed = tag.trim();
-    existing.tags = existing.tags.filter((t) => t !== trimmed);
-    existing.updatedAt = new Date();
-    this.bookmarks.set(id, existing);
-    return existing;
   }
 
   static async delete(id: string): Promise<boolean> {
