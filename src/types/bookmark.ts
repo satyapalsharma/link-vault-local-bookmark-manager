@@ -1,4 +1,4 @@
-import { Id, Timestamps, BookmarkSortField } from "./common";
+import { Id, Timestamps } from "./common";
 
 export interface Bookmark extends Timestamps {
   id: Id;
@@ -7,7 +7,7 @@ export interface Bookmark extends Timestamps {
   notes?: string;
   tags: string[];
   isFavorite: boolean;
-  lastVisited?: Date;
+  lastVisitedAt: Date | null;
 }
 
 export interface CreateBookmarkInput {
@@ -24,23 +24,15 @@ export interface UpdateBookmarkInput {
   notes?: string;
   tags?: string[];
   isFavorite?: boolean;
-  lastVisited?: Date;
+  lastVisitedAt?: Date | null;
 }
 
 export interface BookmarkQueryParams {
   page?: number;
   limit?: number;
   search?: string;
-  q?: string;
   tags?: string;
-  tag?: string;
   isFavorite?: boolean;
-  from?: string;
-  to?: string;
   sortBy?: BookmarkSortField;
   sortOrder?: "asc" | "desc";
-}
-
-export interface AddTagInput {
-  tag: string;
 }

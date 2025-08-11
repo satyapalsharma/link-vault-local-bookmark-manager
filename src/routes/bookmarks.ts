@@ -8,6 +8,6 @@ router.get("/:id", BookmarkController.getById);
 router.post("/", BookmarkController.create);
 router.put("/:id", BookmarkController.update);
 router.delete("/:id", BookmarkController.delete);
-router.post("/:id/favorite", BookmarkController.toggleFavorite);
+router.post("/:id/visit", BookmarkController.visit);
 
 export default router;

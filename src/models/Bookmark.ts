@@ -87,6 +87,7 @@ export class BookmarkModel {
       notes: typeof input.notes === "string" ? input.notes : "",
       tags: input.tags || [],
       isFavorite: input.isFavorite ?? false,
+      lastVisitedAt: null,
       createdAt: now,
       updatedAt: now,
     };
@@ -101,6 +102,19 @@ export class BookmarkModel {
     const updated: Bookmark = {
       ...existing,
       ...input,
+      updatedAt: new Date(),
+    };
+    this.bookmarks.set(id, updated);
+    return updated;
+  }
+
+  static async visit(id: string): Promise<Bookmark | null> {
+    const existing = this.bookmarks.get(id);
+    if (!existing) return null;
+
+    const updated: Bookmark = {
+      ...existing,
+      lastVisitedAt: new Date(),
       updatedAt: new Date(),
     };
     this.bookmarks.set(id, updated);
