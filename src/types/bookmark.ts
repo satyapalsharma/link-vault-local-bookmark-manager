@@ -7,7 +7,7 @@ export interface Bookmark extends Timestamps {
   notes?: string;
   tags: string[];
   isFavorite: boolean;
-  lastVisitedAt: Date | null;
+  lastVisited?: Date;
 }
 
 export interface CreateBookmarkInput {
@@ -24,7 +24,7 @@ export interface UpdateBookmarkInput {
   notes?: string;
   tags?: string[];
   isFavorite?: boolean;
-  lastVisitedAt?: Date | null;
+  lastVisited?: Date;
 }
 
 export interface BookmarkQueryParams {
@@ -33,6 +33,5 @@ export interface BookmarkQueryParams {
   search?: string;
   tags?: string;
   isFavorite?: boolean;
-  sortBy?: BookmarkSortField;
-  sortOrder?: "asc" | "desc";
+  sort?: string;
 }

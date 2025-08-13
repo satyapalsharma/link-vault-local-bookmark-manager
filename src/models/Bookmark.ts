@@ -21,20 +21,6 @@ export class BookmarkModel {
       );
     }
 
-    if (params?.tag) {
-      results = results.filter((b) => b.tags.includes(params.tag!));
-    }
-
-    if (params?.from) {
-      const fromDate = new Date(params.from);
-      results = results.filter((b) => new Date(b.createdAt) >= fromDate);
-    }
-
-    if (params?.to) {
-      const toDate = new Date(params.to);
-      results = results.filter((b) => new Date(b.createdAt) <= toDate);
-    }
-
     if (params?.tags) {
       const filterTags = params.tags.toLowerCase().split(",");
       results = results.filter((b) =>
@@ -46,22 +32,40 @@ export class BookmarkModel {
       results = results.filter((b) => b.isFavorite === params.isFavorite);
     }
 
-    const sortField = params?.sortBy || "createdAt";
-    const sortOrder = params?.sortOrder || "desc";
+    const sort = params?.sort || "-createdAt";
+    const sortField = sort.replace("-", "");
+    const sortDesc = sort.startsWith("-");
 
     results.sort((a, b) => {
-      const aVal = a[sortField as keyof Bookmark];
-      const bVal = b[sortField as keyof Bookmark];
-      if (aVal instanceof Date && bVal instanceof Date) {
-        return sortOrder === "asc" ? aVal.getTime() - bVal.getTime() : bVal.getTime() - aVal.getTime();
+      let cmp = 0;
+
+      if (sortField === "createdAt") {
+        const aTime = a.createdAt.getTime();
+        const bTime = b.createdAt.getTime();
+        cmp = aTime - bTime;
+      } else if (sortField === "title") {
+        cmp = a.title.toLowerCase().localeCompare(b.title.toLowerCase());
+      } else if (sortField === "lastVisitedAt") {
+        const aVal = a.lastVisited;
+        const bVal = b.lastVisited;
+        if (aVal === undefined && bVal === undefined) {
+          cmp = 0;
+        } else if (aVal === undefined) {
+          cmp = -1;
+        } else if (bVal === undefined) {
+          cmp = 1;
+        } else {
+          cmp = aVal.getTime() - bVal.getTime();
+        }
       }
-      if (typeof aVal === "string" && typeof bVal === "string") {
-        return sortOrder === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+
+      if (cmp === 0) {
+        const aTime = a.createdAt.getTime();
+        const bTime = b.createdAt.getTime();
+        cmp = bTime - aTime;
       }
-      if (typeof aVal === "boolean" && typeof bVal === "boolean") {
-        return sortOrder === "asc" ? (aVal === bVal ? 0 : aVal ? 1 : -1) : aVal === bVal ? 0 : aVal ? -1 : 1;
-      }
-      return 0;
+
+      return sortDesc ? -cmp : cmp;
     });
 
     const page = params?.page || 1;
@@ -84,10 +88,9 @@ export class BookmarkModel {
       id,
       url: input.url,
       title: input.title,
-      notes: typeof input.notes === "string" ? input.notes : "",
+      notes: input.notes,
       tags: input.tags || [],
       isFavorite: input.isFavorite ?? false,
-      lastVisitedAt: null,
       createdAt: now,
       updatedAt: now,
     };
@@ -102,19 +105,6 @@ export class BookmarkModel {
     const updated: Bookmark = {
       ...existing,
       ...input,
-      updatedAt: new Date(),
-    };
-    this.bookmarks.set(id, updated);
-    return updated;
-  }
-
-  static async visit(id: string): Promise<Bookmark | null> {
-    const existing = this.bookmarks.get(id);
-    if (!existing) return null;
-
-    const updated: Bookmark = {
-      ...existing,
-      lastVisitedAt: new Date(),
       updatedAt: new Date(),
     };
     this.bookmarks.set(id, updated);
