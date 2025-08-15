@@ -1,0 +1,9 @@
+# Default owners for everything
+* @username
+
+# Source code ownership
+/src/ @username
+/routes/ @username
+/models/ @username
+/app.js @username
+/server.js @username
