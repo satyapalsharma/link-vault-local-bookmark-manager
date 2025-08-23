@@ -1,30 +1,16 @@
-import { logger } from "./logger";
+import { PrismaClient } from '@prisma/client';
+import { logger } from './logger';
 
-/**
- * Placeholder for the database client.
- * Replace with actual Prisma client initialization when Prisma is added.
- */
-export class PrismaClient {
-  private static instance: PrismaClient;
+const globalForPrisma = globalThis as unknown as {
+  prisma?: PrismaClient;
+};
 
-  private constructor() {
-    logger.info("PrismaClient initialized (placeholder)");
-  }
+export const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
-  static getInstance(): PrismaClient {
-    if (!PrismaClient.instance) {
-      PrismaClient.instance = new PrismaClient();
-    }
-    return PrismaClient.instance;
-  }
-
-  async $connect() {
-    logger.debug("PrismaClient $connect called (no-op)");
-  }
-
-  async $disconnect() {
-    logger.debug("PrismaClient $disconnect called (no-op)");
-  }
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma;
 }
 
-export const prisma = PrismaClient.getInstance();
+logger.info('PrismaClient initialized');
+
+export { PrismaClient };

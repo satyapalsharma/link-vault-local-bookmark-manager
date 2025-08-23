@@ -1,4 +1,4 @@
-import { Id, Timestamps } from "./common";
+import { Id, Timestamps, BookmarkSortField } from "./common";
 
 export interface Bookmark extends Timestamps {
   id: Id;
@@ -33,5 +33,5 @@ export interface BookmarkQueryParams {
   search?: string;
   tags?: string;
   isFavorite?: boolean;
-  sort?: string;
+  sort?: BookmarkSortField;
 }
