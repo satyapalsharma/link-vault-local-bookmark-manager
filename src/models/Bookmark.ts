@@ -8,6 +8,11 @@ export class BookmarkModel {
   private static bookmarks: Map<string, Bookmark> = new Map();
   private static counter = 0;
 
+  /**
+   * Retrieve all bookmarks with optional filtering, sorting, and pagination.
+   * @param params - Query parameters for filtering, sorting, and pagination
+   * @returns A promise that resolves to an array of bookmarks
+   */
   static async findAll(params?: BookmarkQueryParams): Promise<Bookmark[]> {
     let results = Array.from(this.bookmarks.values());
 
@@ -76,10 +81,20 @@ export class BookmarkModel {
     return results.slice(start, end);
   }
 
+  /**
+   * Find a bookmark by its unique identifier.
+   * @param id - The bookmark ID to search for
+   * @returns A promise that resolves to the bookmark if found, or null
+   */
   static async findById(id: string): Promise<Bookmark | null> {
     return this.bookmarks.get(id) || null;
   }
 
+  /**
+   * Create a new bookmark entry.
+   * @param input - The bookmark data to create
+   * @returns A promise that resolves to the created bookmark
+   */
   static async create(input: CreateBookmarkInput): Promise<Bookmark> {
     this.counter++;
     const id = `bookmark_${this.counter}_${Date.now()}`;
@@ -98,6 +113,12 @@ export class BookmarkModel {
     return bookmark;
   }
 
+  /**
+   * Update an existing bookmark.
+   * @param id - The bookmark ID to update
+   * @param input - The partial bookmark data to apply
+   * @returns A promise that resolves to the updated bookmark, or null if not found
+   */
   static async update(id: string, input: UpdateBookmarkInput): Promise<Bookmark | null> {
     const existing = this.bookmarks.get(id);
     if (!existing) return null;
@@ -111,10 +132,19 @@ export class BookmarkModel {
     return updated;
   }
 
+  /**
+   * Delete a bookmark by its ID.
+   * @param id - The bookmark ID to delete
+   * @returns A promise that resolves to true if the bookmark was deleted, false otherwise
+   */
   static async delete(id: string): Promise<boolean> {
     return this.bookmarks.delete(id);
   }
 
+  /**
+   * Get the total count of bookmarks.
+   * @returns A promise that resolves to the number of bookmarks
+   */
   static async count(): Promise<number> {
     return this.bookmarks.size;
   }
