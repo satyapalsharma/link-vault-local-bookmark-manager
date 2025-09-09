@@ -5,7 +5,7 @@ import morgan from "morgan";
 import { config } from "@/config";
 import { logger } from "@/lib/logger";
 import { errorHandler } from "@/middleware/errorHandler";
-import apiRoutes from "@/routes";
+import apiRoutes from "./routes";
 
 const app = express();
 

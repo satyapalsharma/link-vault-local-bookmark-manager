@@ -133,6 +133,24 @@ export class BookmarkModel {
   }
 
   /**
+   * Record a visit to a bookmark by updating its lastVisited timestamp.
+   * @param id - The bookmark ID to mark as visited
+   * @returns A promise that resolves to the updated bookmark, or null if not found
+   */
+  static async visit(id: string): Promise<Bookmark | null> {
+    const existing = this.bookmarks.get(id);
+    if (!existing) return null;
+
+    const updated: Bookmark = {
+      ...existing,
+      lastVisited: new Date(),
+      updatedAt: new Date(),
+    };
+    this.bookmarks.set(id, updated);
+    return updated;
+  }
+
+  /**
    * Delete a bookmark by its ID.
    * @param id - The bookmark ID to delete
    * @returns A promise that resolves to true if the bookmark was deleted, false otherwise

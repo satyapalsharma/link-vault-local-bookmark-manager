@@ -16,7 +16,7 @@ export class TagController {
 
   static async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { id } = req.params;
+      const { id } = req.params as { id: string };
       const tag = await TagModel.findById(id);
       if (!tag) {
         throw new NotFoundError("Tag not found");

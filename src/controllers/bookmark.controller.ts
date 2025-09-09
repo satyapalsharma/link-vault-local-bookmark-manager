@@ -44,7 +44,7 @@ export class BookmarkController {
 
   static async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { id } = req.params;
+      const { id } = req.params as { id: string };
       const bookmark = await BookmarkModel.findById(id);
       if (!bookmark) {
         throw new NotFoundError("Bookmark not found");
