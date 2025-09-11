@@ -1,16 +1,17 @@
-import { PrismaClient } from '@prisma/client';
-import { logger } from './logger';
+import { DatabaseSync } from "node:sqlite";
+import { logger } from "./logger";
 
-const globalForPrisma = globalThis as unknown as {
-  prisma?: PrismaClient;
+const globalForDb = globalThis as unknown as {
+  db?: DatabaseSync;
 };
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+export const db =
+  globalForDb.db ?? new DatabaseSync(process.env.DATABASE_URL || "./link-vault.db");
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== "production") {
+  globalForDb.db = db;
 }
 
-logger.info('PrismaClient initialized');
+logger.info("SQLite database initialized");
 
-export { PrismaClient };
+export { DatabaseSync };
