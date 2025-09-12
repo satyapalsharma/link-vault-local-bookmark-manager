@@ -58,7 +58,7 @@ export class TagController {
 
   static async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { id } = req.params;
+      const { id } = req.params as { id: string };
       const deleted = await TagModel.delete(id);
       if (!deleted) {
         throw new NotFoundError("Tag not found");

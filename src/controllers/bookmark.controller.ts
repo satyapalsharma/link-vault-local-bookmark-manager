@@ -84,7 +84,7 @@ export class BookmarkController {
 
   static async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { id } = req.params;
+      const { id } = req.params as { id: string };
       const deleted = await BookmarkModel.delete(id);
       if (!deleted) {
         throw new NotFoundError("Bookmark not found");
