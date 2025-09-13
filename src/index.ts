@@ -5,7 +5,9 @@ import morgan from "morgan";
 import { config } from "@/config";
 import { logger } from "@/lib/logger";
 import { errorHandler } from "@/middleware/errorHandler";
-import apiRoutes from "./routes";
+import apiRoutes from "./routes/index";
+import bookmarksRouter from "./routes/bookmarks";
+import tagsRouter from "./routes/tags";
 
 const app = express();
 
@@ -17,6 +19,8 @@ app.use(express.json());
 app.get("/", (_req, res) => res.json({ status: "ok", service: "Link Vault" }));
 
 app.use("/api/v1", apiRoutes);
+app.use("/api/v1/bookmarks", bookmarksRouter);
+app.use("/api/v1/tags", tagsRouter);
 
 app.use(errorHandler);
 

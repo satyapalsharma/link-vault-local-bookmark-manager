@@ -1,10 +1,13 @@
 import { Router } from "express";
-import bookmarksRouter from "./bookmarks";
-import tagsRouter from "./tags";
 
 const router = Router();
 
-router.use("/bookmarks", bookmarksRouter);
-router.use("/tags", tagsRouter);
+// Root endpoint for the API: lists the available resource collections.
+router.get("/", (_req, res) => {
+  res.json({
+    status: "ok",
+    resources: ["/bookmarks", "/tags"],
+  });
+});
 
 export default router;
