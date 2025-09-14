@@ -97,7 +97,7 @@ export class BookmarkController {
 
   static async visit(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { id } = req.params;
+      const { id } = req.params as { id: string };
       const bookmark = await BookmarkModel.visit(id);
       if (!bookmark) {
         res.status(404).json({ error: "Bookmark not found." });

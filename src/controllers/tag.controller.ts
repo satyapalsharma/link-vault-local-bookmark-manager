@@ -44,7 +44,7 @@ export class TagController {
 
   static async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { id } = req.params;
+      const { id } = req.params as { id: string };
       const body = req.body as UpdateTagInput;
       const tag = await TagModel.update(id, body);
       if (!tag) {
