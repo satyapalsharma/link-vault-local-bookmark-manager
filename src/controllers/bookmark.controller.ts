@@ -69,7 +69,7 @@ export class BookmarkController {
 
   static async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { id } = req.params;
+      const { id } = req.params as { id: string };
       const body = req.body as UpdateBookmarkInput;
       if (body.url) validateUrl(body.url);
       const bookmark = await BookmarkModel.update(id, body);
